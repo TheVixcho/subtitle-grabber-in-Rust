@@ -1,0 +1,9 @@
+/target/
+/gen/
+**/*.rs.bk
+Cargo.lock
+
+.DS_Store
+Thumbs.db
+
+subtitles/

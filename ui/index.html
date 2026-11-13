@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subtitle Grabber</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style id="custom-theme-style"></style>
+  </head>
+  <body>
+    <div id="splash" class="splash" aria-hidden="true">
+      <div class="splash-card">
+        <pre id="splash-ascii" class="ascii-art"></pre>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="3" />
+              <line x1="6" y1="11" x2="15" y2="11" />
+              <line x1="6" y1="15" x2="12" y2="15" />
+              <circle cx="17" cy="15" r="1.2" fill="currentColor" stroke="none" />
+            </svg>
+          </div>
+          <span class="brand-title">Subtitle Grabber</span>
+        </div>
+
+        <nav class="nav" aria-label="Navigation">
+          <button class="nav-item active" data-view="grabber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>Grabber</span>
+          </button>
+
+          <button class="nav-item" data-view="library">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+            <span>Library</span>
+            <span id="library-count" class="nav-badge">0</span>
+          </button>
+
+          <button class="nav-item" data-view="engine">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <circle cx="12" cy="12" r="9" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span>Settings &amp; About</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div id="sidebar-engine-card" class="engine-card">
+            <div class="engine-row">
+              <span id="sidebar-engine-dot" class="dot dot-warn"></span>
+              <span id="sidebar-engine-label" class="engine-label">Checking yt-dlp...</span>
+            </div>
+            <button id="sidebar-install-btn" class="btn btn-sm btn-accent hidden">
+              Install yt-dlp
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <section id="view-grabber" class="view active">
+          <header class="topbar">
+            <div class="url-bar">
+              <svg class="url-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                id="url-input"
+                type="text"
+                placeholder="https://www.youtube.com/watch?v=..."
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button id="paste-btn" class="icon-btn">Paste</button>
+              <button id="clear-url-btn" class="icon-btn hidden">Clear</button>
+            </div>
+            <button id="fetch-btn" class="btn btn-primary">
+              <span id="fetch-spinner" class="spinner hidden"></span>
+              <span id="fetch-btn-text">Fetch</span>
+            </button>
+          </header>
+
+          <div id="ytdlp-alert" class="alert-banner hidden">
+            <span>yt-dlp is required to read and download subtitles.</span>
+            <button id="alert-install-btn" class="btn btn-sm btn-accent">
+              <span id="install-spinner" class="spinner hidden"></span>
+              <span id="alert-install-text">Install yt-dlp</span>
+            </button>
+          </div>
+
+          <div id="welcome-state" class="welcome-state">
+            <pre id="welcome-ascii" class="ascii-art ascii-art-subtle"></pre>
+            <p class="welcome-prompt">Paste a YouTube link above to get started.</p>
+          </div>
+
+          <div id="workbench" class="workbench hidden">
+            <div class="video-hero">
+              <div class="thumb-wrap">
+                <img id="video-thumb" alt="Video thumbnail" />
+              </div>
+              <div class="video-meta">
+                <h1 id="video-title" class="video-title">Video Title</h1>
+                <div class="video-badges">
+                  <span id="video-channel" class="pill">Channel</span>
+                  <span id="video-duration" class="pill">0:00</span>
+                  <span id="video-count" class="pill pill-accent">0 tracks</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-grid">
+              <div class="panel tracks-panel">
+                <div class="panel-header">
+                  <input
+                    id="track-filter"
+                    class="panel-search"
+                    type="text"
+                    placeholder="Filter languages..."
+                    autocomplete="off"
+                  />
+                  <div class="filter-tabs" role="tablist">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="official">Official</button>
+                    <button class="filter-tab" data-filter="auto">Auto</button>
+                  </div>
+                </div>
+                <div id="tracks-list" class="tracks-list"></div>
+              </div>
+
+              <div class="panel inspector-panel">
+                <div class="inspector-body">
+                  <div class="field-group">
+                    <label for="dest-input">Save to</label>
+                    <div class="folder-row">
+                      <input id="dest-input" type="text" spellcheck="false" />
+                      <button id="browse-btn" class="btn btn-secondary">Browse</button>
+                      <button id="open-dest-btn" class="btn btn-ghost">Open</button>
+                    </div>
+                  </div>
+
+                  <div class="selected-summary">
+                    <span id="selected-track-display" class="summary-value">Select a track</span>
+                  </div>
+
+                  <button id="download-btn" class="btn btn-primary btn-block" disabled>
+                    <span id="download-spinner" class="spinner hidden"></span>
+                    <span id="download-btn-text">Download .SRT</span>
+                  </button>
+
+                  <div id="download-result-card" class="result-card hidden">
+                    <div id="result-filename" class="result-file"></div>
+                    <div class="result-actions">
+                      <button id="result-preview-btn" class="btn btn-sm btn-secondary">Preview</button>
+                      <button id="result-open-btn" class="btn btn-sm btn-ghost">Open Folder</button>
+                    </div>
+                  </div>
+
+                  <div class="console-section">
+                    <div id="console-log" class="console-log"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-library" class="view">
+          <div class="view-header">
+            <h1>Library</h1>
+            <div class="header-actions">
+              <button id="library-refresh-btn" class="btn btn-secondary">Refresh</button>
+              <button id="library-open-btn" class="btn btn-primary">Open Folder</button>
+            </div>
+          </div>
+
+          <div class="library-split">
+            <div class="panel library-list-panel">
+              <div id="library-list" class="library-list"></div>
+            </div>
+
+            <div class="panel library-preview-panel">
+              <div class="panel-header">
+                <span id="preview-title" class="panel-title">Preview</span>
+              </div>
+              <pre id="preview-content" class="srt-viewer">Select a file to preview.</pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-engine" class="view">
+          <div class="view-header">
+            <h1>Settings &amp; About</h1>
+          </div>
+
+          <div class="settings-grid">
+            <div class="panel settings-card settings-card-wide">
+              <div class="panel-header">
+                <span class="panel-title">License &amp; Credits</span>
+                <button id="replay-splash-btn" class="link-btn">Replay Intro</button>
+              </div>
+              <div class="settings-body about-body">
+                <pre id="settings-ascii" class="ascii-art ascii-art-subtle"></pre>
+                <div class="about-copy">
+                  <p>
+                    <strong>Open Source (MIT License)</strong>
+                  </p>
+                  <p>
+                    Original idea and terminal program (<code>subtitle-grabber</code>) by <strong>Meke</strong>.
+                    This fork is ported to Rust with a native desktop GUI developed by <strong>TheVixcho</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel settings-card settings-card-wide">
+              <div class="panel-header">
+                <span class="panel-title">Colors &amp; CSS</span>
+              </div>
+              <div class="settings-body">
+                <div class="palette-bar">
+                  <div class="palette-grid" id="theme-presets">
+                    <button
+                      class="color-tile active"
+                      data-theme="obsidian"
+                      aria-label="Dark Blue"
+                      style="background: linear-gradient(135deg, #0d0f14 50%, #38bdf8 50%);"
+                    ></button>
+                    <button
+                      class="color-tile"
+                      data-theme="spotify"
+                      aria-label="Dark Green"
+                      style="background: linear-gradient(135deg, #121212 50%, #1db954 50%);"
+                    ></button>
+                    <button
+                      class="color-tile"
+                      data-theme="nord"
+                      aria-label="Arctic Slate"
+                      style="background: linear-gradient(135deg, #2e3440 50%, #88c0d0 50%);"
+                    ></button>
+                    <button
+                      class="color-tile"
+                      data-theme="dracula"
+                      aria-label="Dark Violet"
+                      style="background: linear-gradient(135deg, #21222c 50%, #bd93f9 50%);"
+                    ></button>
+                    <button
+                      class="color-tile"
+                      data-theme="monokai"
+                      aria-label="Warm Dark Lime"
+                      style="background: linear-gradient(135deg, #1e1f1c 50%, #a6e22e 50%);"
+                    ></button>
+                    <button
+                      class="color-tile"
+                      data-theme="light"
+                      aria-label="Light Blue"
+                      style="background: linear-gradient(135deg, #f6f8fa 50%, #0969da 50%);"
+                    ></button>
+                  </div>
+
+                  <div class="color-pickers">
+                    <label class="picker-item" title="Accent color">
+                      <input id="picker-accent" type="color" value="#38bdf8" />
+                      <span>Accent</span>
+                    </label>
+                    <label class="picker-item" title="Background color">
+                      <input id="picker-bg" type="color" value="#0d0f14" />
+                      <span>Background</span>
+                    </label>
+                    <button id="reset-colors-btn" class="btn btn-sm btn-ghost">Reset Colors</button>
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <label for="custom-css-input">Custom CSS</label>
+                  <textarea
+                    id="custom-css-input"
+                    class="css-editor"
+                    rows="6"
+                    spellcheck="false"
+                    placeholder=":root { --accent-cyan: #ff7a33; }"
+                  ></textarea>
+                </div>
+
+                <div class="settings-actions">
+                  <button id="apply-css-btn" class="btn btn-primary">Apply CSS</button>
+                  <button id="import-css-btn" class="btn btn-secondary">Import .css</button>
+                  <button id="clear-css-btn" class="btn btn-ghost">Reset CSS</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel settings-card">
+              <div class="panel-header">
+                <span class="panel-title">yt-dlp</span>
+              </div>
+              <div class="settings-body">
+                <div class="kv-row">
+                  <span>Status</span>
+                  <strong id="settings-engine-status">Checking...</strong>
+                </div>
+                <div class="kv-row">
+                  <span>Version</span>
+                  <strong id="settings-engine-version">—</strong>
+                </div>
+                <div class="kv-row">
+                  <span>Path</span>
+                  <code id="settings-engine-path">—</code>
+                </div>
+                <div class="settings-actions">
+                  <button id="settings-recheck-btn" class="btn btn-secondary">Re-check</button>
+                  <button id="settings-install-btn" class="btn btn-accent">
+                    Install / Update yt-dlp
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel settings-card">
+              <div class="panel-header">
+                <span class="panel-title">Default Folder</span>
+              </div>
+              <div class="settings-body">
+                <div class="folder-row">
+                  <input id="settings-default-dir" type="text" spellcheck="false" />
+                  <button id="settings-browse-btn" class="btn btn-secondary">Browse</button>
+                </div>
+                <div class="settings-actions">
+                  <button id="settings-save-dir-btn" class="btn btn-primary">Save</button>
+                  <button id="settings-reset-dir-btn" class="btn btn-ghost">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="statusbar">
+      <div class="status-left">
+        <button id="status-engine-btn" class="status-item">
+          <span id="status-dot" class="dot dot-warn"></span>
+          <span id="status-engine-text">yt-dlp: checking</span>
+        </button>
+        <span class="status-sep">|</span>
+        <span id="status-message" class="status-item">Ready</span>
+      </div>
+      <div class="status-right">
+        <span id="status-dest" class="status-item">~/Downloads/subtitles</span>
+        <span class="status-sep">|</span>
+        <span class="status-item">MIT License</span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
